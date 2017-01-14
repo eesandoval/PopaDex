@@ -68,9 +68,9 @@ public class MainActivity extends AppCompatActivity
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-                Object o = lv.getItemAtPosition(position);
+                String clickedName = lv.getItemAtPosition(position).toString();
                 Intent intent = new Intent(MainActivity.this,PokemonActivity.class);
-                intent.putExtra("ID", position + 1);
+                intent.putExtra("Name", clickedName);
                 startActivity(intent);
             }
         });

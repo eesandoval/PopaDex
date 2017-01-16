@@ -279,8 +279,6 @@ public class PokemonTabbedSub1 extends Fragment {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(false);
         xAxis.setTextSize(11f);
-        xAxis.setDrawLabels(true);
-
         YAxis yAxis = barChart.getAxisLeft();
         yAxis.setAxisMinimum(0f);
         if (biggestStat > 150)
@@ -297,6 +295,8 @@ public class PokemonTabbedSub1 extends Fragment {
         barChart.getLegend().setEnabled(false);
         barChart.getAxisRight().setEnabled(false);
         barChart.getAxisRight().setDrawGridLines(false);
+        barChart.setTouchEnabled(false);
+        xAxis.setDrawLabels(true);
         barChart.invalidate();
 
 // Now for the type images

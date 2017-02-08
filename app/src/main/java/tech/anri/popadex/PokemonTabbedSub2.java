@@ -1,6 +1,7 @@
 package tech.anri.popadex;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -11,6 +12,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
@@ -127,7 +129,7 @@ public class PokemonTabbedSub2 extends Fragment {
 
         // Last step for moves: grab info from the Moves table
         ArrayList<String> moveNames = new ArrayList<>();
-//        ArrayList<String> moveTypes = new ArrayList<>();
+        ArrayList<String> moveTypes = new ArrayList<>();
 //        ArrayList<String> moveCategories = new ArrayList<>();
 //        ArrayList<Integer> movePowers = new ArrayList<>();
 //        ArrayList<Integer> moveAccuracies = new ArrayList<>();
@@ -135,7 +137,7 @@ public class PokemonTabbedSub2 extends Fragment {
 //        ArrayList<String> moveTMs = new ArrayList<>();
 //        ArrayList<String> moveEffects = new ArrayList<>();
 //        ArrayList<String> moveEffectChances = new ArrayList<>();
-        columns = new String[]{"Name"};//,"Type", "Category", "Power", "Accuracy", "PP", "TM", "Effect", "EffectChance"};
+        columns = new String[]{"Name", "Type"};//, "Category", "Power", "Accuracy", "PP", "TM", "Effect", "EffectChance"};
         ArrayList<HashMap<String, String>> data = new ArrayList<>();
         for (int i = 0; i < moveIDs.size(); ++i) {
             c = pRead.query("Moves", columns, "ID=" + String.valueOf(moveIDs.get(i)), null, null, null, null);
@@ -143,7 +145,7 @@ public class PokemonTabbedSub2 extends Fragment {
             {
                 HashMap<String, String> datum = new HashMap<>();
                 moveNames.add(c.getString(0));
-//                moveTypes.add(c.getString(1));
+                moveTypes.add(c.getString(1));
 //                moveCategories.add(c.getString(2));
 //                movePowers.add(c.getInt(3));
 //                moveAccuracies.add(c.getInt(4));
@@ -164,8 +166,18 @@ public class PokemonTabbedSub2 extends Fragment {
         EditText enteredMoveName = (EditText)getView().findViewById(R.id.editTextPokemonMoves);
 
         pRead.close();
-        ListView levelListView = (ListView) getView().findViewById(R.id.levelListVIew);
+        final ListView levelListView = (ListView) getView().findViewById(R.id.levelListVIew);
         adapter = new SimpleAdapter(this.getActivity(), data, android.R.layout.simple_list_item_2, new String[] {"MoveName", "MoveMethod"}, new int[] {android.R.id.text1, android.R.id.text2});
+
+        levelListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+                String clickedMove = levelListView.getItemAtPosition(position).toString();
+                Intent intent = new Intent(PokemonTabbedSub2.this.getContext(),MoveActivity.class);
+                intent.putExtra("MoveName", clickedMove);
+                startActivity(intent);
+            }
+        });
         levelListView.setAdapter(adapter);
         levelListView.setTextFilterEnabled(true);
         enteredMoveName.addTextChangedListener(new TextWatcher()

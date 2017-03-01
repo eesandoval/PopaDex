@@ -43,7 +43,14 @@ public class PokemonTabbedSub1 extends Fragment {
 
     // TODO: Rename and change types of parameters
     private String clickedName;
-
+    private int HP;
+    private int Attack;
+    private int Defense;
+    private int SpAtk;
+    private int SpDef;
+    private int Speed;
+    private int Dex;
+    private int pokemonID;
     private OnFragmentInteractionListener mListener;
 
     public PokemonTabbedSub1() {
@@ -108,14 +115,14 @@ public class PokemonTabbedSub1 extends Fragment {
         String Name = c.getString(0);
         String Type1 = c.getString(7);
         String Type2 = c.getString(8);
-        int HP = c.getInt(1);
-        int Attack = c.getInt(2);
-        int Defense = c.getInt(3);
-        int SpAtk = c.getInt(4);
-        int SpDef = c.getInt(5);
-        int Speed = c.getInt(6);
-        int Dex = c.getInt(9);
-        int pokemonID = c.getInt(10);
+        HP = c.getInt(1);
+        Attack = c.getInt(2);
+        Defense = c.getInt(3);
+        SpAtk = c.getInt(4);
+        SpDef = c.getInt(5);
+        Speed = c.getInt(6);
+        Dex = c.getInt(9);
+        pokemonID = c.getInt(10);
 
         // Close the cursor
         c.close();
@@ -218,87 +225,6 @@ public class PokemonTabbedSub1 extends Fragment {
         nameTextView.setText(Name);
         dexTextView.setText(pokemonDex);
 
-// *Deep breath* the stat bar...
-        BarChart barChart = (BarChart) getView().findViewById(R.id.barChartStats);
-        ArrayList<BarEntry> statsEntries = new ArrayList<>();
-        statsEntries.add(new BarEntry(0f,HP));
-        statsEntries.add(new BarEntry(1f,Attack));
-        statsEntries.add(new BarEntry(2f,Defense));
-        statsEntries.add(new BarEntry(3f,SpAtk));
-        statsEntries.add(new BarEntry(4f,SpDef));
-        statsEntries.add(new BarEntry(5f,Speed));
-        BarDataSet barDataSet = new BarDataSet(statsEntries,"");
-        barDataSet.setValueTextSize(11f);
-        barDataSet.setValueFormatter(new LargeValueFormatter());
-        int[] statsColors = new int[6];
-        ArrayList<Integer> stats = new ArrayList<>();
-        stats.add(HP);
-        stats.add(Attack);
-        stats.add(Defense);
-        stats.add(SpAtk);
-        stats.add(SpDef);
-        stats.add(Speed);
-
-        int biggestStat = 0;
-
-        for (int i = 0; i < stats.size(); ++i) {
-            if (stats.get(i) < 15)
-                statsColors[i] = getResources().getColor(R.color.holo_red_dark);
-            else if (stats.get(i) < 45)
-                statsColors[i] = getResources().getColor(R.color.holo_red_light);
-            else if (stats.get(i) < 60)
-                statsColors[i] = getResources().getColor(R.color.holo_orange_dark);
-            else if (stats.get(i) < 75)
-                statsColors[i] = getResources().getColor(R.color.holo_orange_light);
-            else if (stats.get(i) < 100)
-                statsColors[i] = getResources().getColor(R.color.holo_green_light);
-            else if (stats.get(i) < 130)
-                statsColors[i] = getResources().getColor(R.color.holo_green_dark);
-            else if (stats.get(i) < 160)
-                statsColors[i] = getResources().getColor(R.color.holo_blue_dark);
-            else if (stats.get(i) <= 190)
-                statsColors[i] = getResources().getColor(R.color.holo_blue_light);
-            else
-                statsColors[i] = getResources().getColor(R.color.holo_blue_bright);
-            if (biggestStat < stats.get(i))
-                biggestStat = stats.get(i);
-        }
-        barDataSet.setColors(statsColors);
-        barDataSet.setDrawValues(true);
-
-        final String[] statsNames = new String[] {"HP", "Attack", "Defense", "SpAtk", "SpDef", "Speed"};
-        IAxisValueFormatter formatter = new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return statsNames[(int) value];
-            }
-        };
-        XAxis xAxis = barChart.getXAxis();
-        xAxis.setGranularity(1f);
-        xAxis.setValueFormatter(formatter);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setDrawGridLines(false);
-        xAxis.setTextSize(11f);
-        YAxis yAxis = barChart.getAxisLeft();
-        yAxis.setAxisMinimum(0f);
-        if (biggestStat > 150)
-            yAxis.setAxisMaximum(biggestStat);
-        else
-            yAxis.setAxisMaximum(150f);
-        BarData chartData = new BarData(barDataSet);
-        chartData.setBarWidth(0.9f);
-
-        barChart.setData(chartData);
-        barChart.setFitBars(true);
-        barChart.setDescription(null);
-        barChart.setDrawBorders(false);
-        barChart.getLegend().setEnabled(false);
-        barChart.getAxisRight().setEnabled(false);
-        barChart.getAxisRight().setDrawGridLines(false);
-        barChart.setTouchEnabled(false);
-        xAxis.setDrawLabels(true);
-        barChart.invalidate();
-
 // Now for the type images
         ImageView type1ImageView = (ImageView) getView().findViewById(R.id.imageViewType1);
         int Type1ResID = getResources().getIdentifier(Type1.toLowerCase(),"drawable",getActivity().getPackageName());
@@ -311,10 +237,10 @@ public class PokemonTabbedSub1 extends Fragment {
             int Type2ResID = getResources().getIdentifier(Type2.toLowerCase(),"drawable",getActivity().getPackageName());
             type2ImageView.setImageResource(Type2ResID);
         }
-        else
-        {
+        else {
             type2ImageView.setVisibility(View.INVISIBLE);
         }
+        CreateBarChart();
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -354,5 +280,94 @@ public class PokemonTabbedSub1 extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    private void CreateBarChart() {
+        // *Deep breath* the stat bar...
+        BarChart barChart = (BarChart) getView().findViewById(R.id.barChartStats);
+        ArrayList<BarEntry> statsEntries = new ArrayList<>();
+        statsEntries.add(new BarEntry(0f,HP));
+        statsEntries.add(new BarEntry(1f,Attack));
+        statsEntries.add(new BarEntry(2f,Defense));
+        statsEntries.add(new BarEntry(3f,SpAtk));
+        statsEntries.add(new BarEntry(4f,SpDef));
+        statsEntries.add(new BarEntry(5f,Speed));
+        BarDataSet barDataSet = new BarDataSet(statsEntries,"");
+        barDataSet.setValueTextSize(11f);
+        barDataSet.setValueFormatter(new LargeValueFormatter());
+        int[] statsColors = new int[6];
+        ArrayList<Integer> stats = new ArrayList<>();
+        stats.add(HP);
+        stats.add(Attack);
+        stats.add(Defense);
+        stats.add(SpAtk);
+        stats.add(SpDef);
+        stats.add(Speed);
+
+        int biggestStat = 0;
+
+        // Set the colors according to the stat
+        // These are scaled according to either the largest stat or 190
+        for (int i = 0; i < stats.size(); ++i) {
+            if (stats.get(i) < 15)
+                statsColors[i] = getResources().getColor(R.color.holo_red_dark);
+            else if (stats.get(i) < 45)
+                statsColors[i] = getResources().getColor(R.color.holo_red_light);
+            else if (stats.get(i) < 60)
+                statsColors[i] = getResources().getColor(R.color.holo_orange_dark);
+            else if (stats.get(i) < 75)
+                statsColors[i] = getResources().getColor(R.color.holo_orange_light);
+            else if (stats.get(i) < 100)
+                statsColors[i] = getResources().getColor(R.color.holo_green_light);
+            else if (stats.get(i) < 130)
+                statsColors[i] = getResources().getColor(R.color.holo_green_dark);
+            else if (stats.get(i) < 160)
+                statsColors[i] = getResources().getColor(R.color.holo_blue_dark);
+            else if (stats.get(i) <= 190)
+                statsColors[i] = getResources().getColor(R.color.holo_blue_light);
+            else
+                statsColors[i] = getResources().getColor(R.color.holo_blue_bright);
+            if (biggestStat < stats.get(i))
+                biggestStat = stats.get(i);
+        }
+        barDataSet.setColors(statsColors);
+        barDataSet.setDrawValues(true);
+
+        // Create the X axis values under the barchart using the IAxisValueFormatter and getFormattedValue
+        final String[] statsNames = new String[] {"HP", "Attack", "Defense", "SpAtk", "SpDef", "Speed"};
+        IAxisValueFormatter formatter = new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return statsNames[(int) value];
+            }
+        };
+
+        // This goes into details for setting the xAxis and yAxis
+        XAxis xAxis = barChart.getXAxis();
+        xAxis.setGranularity(1f);
+        xAxis.setValueFormatter(formatter);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawGridLines(false);
+        xAxis.setTextSize(11f);
+        YAxis yAxis = barChart.getAxisLeft();
+        yAxis.setAxisMinimum(0f);
+        if (biggestStat > 150)
+            yAxis.setAxisMaximum(biggestStat);
+        else
+            yAxis.setAxisMaximum(150f);
+        BarData chartData = new BarData(barDataSet);
+        chartData.setBarWidth(0.9f);
+
+        // Sets the details for the barChart itself
+        barChart.setData(chartData);
+        barChart.setFitBars(true);
+        barChart.setDescription(null);
+        barChart.setDrawBorders(false);
+        barChart.getLegend().setEnabled(false);
+        barChart.getAxisRight().setEnabled(false);
+        barChart.getAxisRight().setDrawGridLines(false);
+        barChart.setTouchEnabled(false);
+        xAxis.setDrawLabels(true);
+        barChart.invalidate();
     }
 }

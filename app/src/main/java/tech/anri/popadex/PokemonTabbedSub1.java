@@ -51,6 +51,10 @@ public class PokemonTabbedSub1 extends Fragment {
     private int Speed;
     private int Dex;
     private int pokemonID;
+    private String Name;
+    private String Type1;
+    private String Type2;
+    private SQLiteDatabase pRead;
     private OnFragmentInteractionListener mListener;
 
     public PokemonTabbedSub1() {
@@ -64,7 +68,6 @@ public class PokemonTabbedSub1 extends Fragment {
      * @param param1 Parameter 1.
      * @return A new instance of fragment PokemonTabbedSub1.
      */
-    // TODO: Rename and change types and number of parameters
     public static PokemonTabbedSub1 newInstance(String param1) {
         PokemonTabbedSub1 fragment = new PokemonTabbedSub1();
         Bundle args = new Bundle();
@@ -93,43 +96,12 @@ public class PokemonTabbedSub1 extends Fragment {
 
         // Setup the database for querying
         Pokemon p = new Pokemon(this.getActivity());
-        SQLiteDatabase pRead = p.getReadableDatabase();
+        this.pRead = p.getReadableDatabase();
 
-        // Query the database into a cursor c
-        String[] columns = new String[]{"Name", "HP", "Attack", "Defense", "SpAtk", "SpDef", "Speed", "Type1", "Type2", "Dex", "ID"};
-        Cursor c;
-        if (clickedName == null)
-            clickedName = "Pikachu";
-        if (clickedName.equals("Farfetch'd")) {
-            c = pRead.query("Pokemon",columns,"ID=105",null,null,null,null);
-        } else if (clickedName.equals("Oricorio Pa'u Style")) {
-            c = pRead.query("Pokemon", columns, "ID=843", null, null, null, null);
-        } else {
-            c = pRead.query("Pokemon", columns, "Name='" + clickedName + "'", null, null, null, null);
-        }
-
-        // Grab what we pulled from the DB by advancing the cursor once
-        c.moveToNext();
-
-        // Store it into variables so we can close the cursor immediately
-        String Name = c.getString(0);
-        String Type1 = c.getString(7);
-        String Type2 = c.getString(8);
-        HP = c.getInt(1);
-        Attack = c.getInt(2);
-        Defense = c.getInt(3);
-        SpAtk = c.getInt(4);
-        SpDef = c.getInt(5);
-        Speed = c.getInt(6);
-        Dex = c.getInt(9);
-        pokemonID = c.getInt(10);
-
-        // Close the cursor
-        c.close();
 
         // Extract the ability data from PokemonAbilities
-        columns = new String[]{"AbilityID", "Hidden"};
-        c = pRead.query("PokemonAbilities",columns,"PokemonID=" + String.valueOf(pokemonID),null,null,null,null);
+        String columns[] = new String[]{"AbilityID", "Hidden"};
+        Cursor c = pRead.query("PokemonAbilities",columns,"PokemonID=" + String.valueOf(pokemonID),null,null,null,null);
 
         // Store it into variables to close the cursor immediately
         ArrayList<Integer> abilityIDs = new ArrayList<>();
@@ -280,6 +252,48 @@ public class PokemonTabbedSub1 extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    private void UpdateThisPokemon(String queryName) {
+
+        // Query the database into a cursor c
+        String[] columns = new String[]{"Name", "HP", "Attack", "Defense", "SpAtk",
+                "SpDef", "Speed", "Type1", "Type2", "Dex", "ID"};
+        Cursor c;
+        if (clickedName == null) {
+            // We'll just leave a default of Pikachu, but how could we even get to this code?
+            clickedName = "Pikachu";
+        }
+
+        // This should avoid Pokemon with names that include apostrophes
+        clickedName = clickedName.replace("'", "");
+
+//        if (clickedName.equals("Farfetch'd")) {
+//            c = pRead.query("Pokemon",columns,"ID=105",null,null,null,null);
+//        } else if (clickedName.equals("Oricorio Pa'u Style")) {
+//            c = pRead.query("Pokemon", columns, "ID=843", null, null, null, null);
+//        } else {
+        c = pRead.query("Pokemon", columns, "Name='" + clickedName + "'", null, null, null, null);
+        //}
+
+        // Grab what we pulled from the DB by advancing the cursor once
+        c.moveToNext();
+
+        // Store it into variables so we can close the cursor immediately
+        this.Name = c.getString(0);
+        this.Type1 = c.getString(7);
+        this.Type2 = c.getString(8);
+        this.HP = c.getInt(1);
+        this.Attack = c.getInt(2);
+        this.Defense = c.getInt(3);
+        this.SpAtk = c.getInt(4);
+        this.SpDef = c.getInt(5);
+        this.Speed = c.getInt(6);
+        this.Dex = c.getInt(9);
+        this.pokemonID = c.getInt(10);
+
+        // Close the cursor
+        c.close();
     }
 
     private void CreateBarChart() {
